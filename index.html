@@ -1,0 +1,43 @@
+﻿<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <title>YouTube Comments Extractor</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+  const apiKey = process.env.YOUTUBE_API_KEY; // Для Netlify
+</script>
+<link rel="stylesheet" href="style.css"> 
+</head>
+<body>
+  <h2><span class="youtube">YouTube</span> Comments Extractor</h2>
+  
+  <div class="input-area">
+    <input type="text" id="videoUrl" placeholder="Вставте посилання на YouTube відео або Shorts">
+    <button id="loadBtn">Завантажити</button>
+    <button id="saveBtn">Експорт в Excel</button>
+  </div>
+
+  <div id="errorMsg" class="error"></div>
+
+  <table id="commentsTable">
+    <thead>
+      <tr>
+        <th width="50px">№</th>
+        <th width="150px">Name</th>
+        <th>Comment</th>
+        <th width="120px">Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td colspan="4" class="status">Введіть посилання на відео та натисніть "Завантажити"</td>
+      </tr>
+    </tbody>
+  </table>
+
+<script src="script.js"></script>
+
+
+</body>
+</html>
