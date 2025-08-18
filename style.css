@@ -46,20 +46,20 @@
       border-radius: 5px;
       overflow: hidden;
       box-shadow: 0 0 0 1px #ddd;
-      font-size: 13px; /* Зменшений розмір шрифта для всієї таблиці */
+      font-size: 14px; /* Зменшений розмір шрифта для всієї таблиці */
     }
     
     th, td {
       border: 1px solid #ddd;
       padding: 8px 10px; /* Зменшений вертикальний padding */
-      font-size: 0.9em; /* Додаткове зменшення розміру шрифта */
+      font-size: 1.0em; /* Додаткове зменшення розміру шрифта */
     }
     
     th {
       background-color: #f2f2f2;
       text-align: center;
       font-weight: bold;
-      font-size: 0.95em; /* Заголовки трохи більші за звичайні комірки */
+      font-size: 1.05em; /* Заголовки трохи більші за звичайні комірки */
     }
     td:first-child, td:last-child {
       text-align: center;
@@ -93,3 +93,4 @@
       color: #666;
 
     }
+
