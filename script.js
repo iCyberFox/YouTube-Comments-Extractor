@@ -10,22 +10,18 @@
       let comments = [];
       
       try {
-        // Отримуємо API ключ з змінної середовища Netlify
         const response = await fetch('/.netlify/functions/getApiKey');
         if (response.ok) {
           const data = await response.json();
           API_KEY = data.apiKey;
-          apiStatus.textContent = 'API ключ успішно завантажено';
-          loadBtn.disabled = false;
-        } else {
-          throw new Error('Не вдалося отримати API ключ');
         }
       } catch (error) {
-        console.error('Помилка отримання API ключа:', error);
-        apiStatus.textContent = 'Помилка завантаження API ключа';
-        apiStatus.classList.add('error');
-        return;
+        console.warn('API key check skipped:', error);
       }
+
+      apiStatus.textContent = 'Готово до завантаження';
+      apiStatus.classList.remove('error');
+      loadBtn.disabled = false;
       
       loadBtn.addEventListener('click', loadComments);
       saveBtn.addEventListener('click', exportToExcel);
@@ -72,53 +68,27 @@
           showMessage("Завантаження коментарів...");
           comments = [];
           saveBtn.disabled = true;
-          
-          let nextPageToken = '';
-          let index = 1;
-          let hasComments = false;
-          
-          do {
-            const response = await fetch(
-              `https://www.googleapis.com/youtube/v3/commentThreads?` +
-              `part=snippet&videoId=${videoId}&key=${API_KEY}` +
-              `&maxResults=100${nextPageToken ? `&pageToken=${nextPageToken}` : ''}`
-            );
-            
-            if (!response.ok) {
-              const errorData = await response.json();
-              let errorMessage = 'Помилка при отриманні коментарів';
-              if (errorData.error && errorData.error.message) {
-                errorMessage += ': ' + errorData.error.message;
-                if (errorData.error.errors && errorData.error.errors[0].reason === 'commentsDisabled') {
-                  errorMessage = 'Коментарі вимкнені для цього відео';
-                }
-              }
-              throw new Error(errorMessage);
-            }
-            
-            const data = await response.json();
-            
-            if (!data.items || data.items.length === 0) {
-              if (!hasComments) {
-                showMessage("Коментарі не знайдено");
-              }
-              return;
-            }
-            
-            hasComments = true;
-            data.items.forEach(item => {
-              const comment = item.snippet.topLevelComment.snippet;
-              comments.push({
-                number: index++,
-                name: comment.authorDisplayName,
-                text: comment.textDisplay,
-                date: new Date(comment.publishedAt).toLocaleDateString('uk-UA')
-              });
-            });
-            
-            nextPageToken = data.nextPageToken || '';
-          } while (nextPageToken);
-          
+
+          const commentsResponse = await fetch(`/.netlify/functions/getComments?videoId=${encodeURIComponent(videoId)}`);
+          if (!commentsResponse.ok) {
+            const errorData = await commentsResponse.json().catch(() => ({}));
+            throw new Error(errorData.error || 'Помилка при отриманні коментарів');
+          }
+
+          const data = await commentsResponse.json();
+
+          if (!data.comments || data.comments.length === 0) {
+            showMessage("Коментарі не знайдено");
+            return;
+          }
+
+          comments = data.comments.map((comment, index) => ({
+            number: index + 1,
+            name: comment.name,
+            text: comment.text,
+            date: comment.date
+          }));
+
           renderTable();
           saveBtn.disabled = false;
         } catch (error) {
